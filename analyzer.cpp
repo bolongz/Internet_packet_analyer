@@ -684,7 +684,7 @@ int main(int argc, char *argv[]){
   size_t tcp_packets = 0;
   size_t icmp_packets = 0;
   size_t other_ip_packets = 0;
-  size_t other_packets;
+  size_t other_packets = 0;
   size_t packet_id = 0;
   /* ---- counter init end ----*/
   while(process_length < filelen){
