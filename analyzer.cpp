@@ -13,17 +13,13 @@
 #include <arpa/inet.h>
 
 std::string int_to_string(const int &a){
-  //function for
-  //std::cout << "your int " << a ;
   std::stringstream stream;
   stream << std::hex << a; //your_int;
   std::string result( stream.str());
-  //std::cout << result << " " << result.size() <<  std::endl;
   return result;
 }
 
 void print_mac_address(uint8_t ad[6]){
-
    for(size_t i = 0 ; i< 6; i++){
      std::string d_mac;
      d_mac = int_to_string(int(ad[i]));
@@ -36,7 +32,6 @@ void print_mac_address(uint8_t ad[6]){
 }
 
 void print_protocol_address(uint8_t pd[4]){
-
   for(size_t i = 0; i < 4; i++){
     if(i == 3){
       std::cout << int(pd[i]) ; // << std::endl;
@@ -46,11 +41,8 @@ void print_protocol_address(uint8_t pd[4]){
   }
 }
 
-
 std::string four_digit_hex(uint16_t type){ //print type
-  //convert the uint16 to hex with length at least four
   std::string t = int_to_string(type);
-  //std::cout << t << std::endl;
   if(t.size() == 3){
     t = "0" + t;
   }else if(t.size() == 2){
@@ -70,18 +62,15 @@ uint32_t nth_bit(uint32_t b, size_t n){
   return uint32_t(1) & (b >> n);
 }// take the nth bit starting from 0
 
-
 class Ethernet_frame{
-
 private:
-
   uint8_t dest_mac[6]; //store the dest_address
   uint8_t src_mac[6]; //source mac
   uint16_t type; // frame type
   size_t packet_id; //packet_id;
   size_t packet_size; // packet size;
   std::string hex_type;
-  //  Ethernet_frame();
+
 public:
 
   void set_value(uint8_t d[6], uint8_t s[6], uint16_t tt,  size_t id, size_t ss){
@@ -159,14 +148,11 @@ public:
 
 };
 
-
 class APR_Message{
-
 private:
 
   uint16_t hardtype; // hard type
   uint16_t protocoltype; //protocol type
-
   uint8_t haddr_len; // hard address length
   uint8_t paddr_len; // protocol address length
   uint16_t operation; //operation
@@ -174,12 +160,10 @@ private:
   uint8_t sender_paddr[4]; // send protocol address
   uint8_t target_haddr[6]; // target hard addr
   uint8_t target_paddr[4]; // target protocol addr
-
   std::string hex_type;
 public:
 
   void set_value(uint16_t ht, uint16_t pt, uint8_t hl, uint8_t pl, uint16_t op, uint8_t sh[6], uint8_t sp[4], uint8_t th[6], uint8_t tp[4]){
-
     hardtype = ntohs(ht);
     protocoltype = ntohs(pt);
     haddr_len = hl;
@@ -295,13 +279,10 @@ public:
       }
     }
   }
-
-
 };
 
 
 class IP{
-
 private:
   uint8_t ip_version;
   uint8_t header_length;
@@ -319,7 +300,6 @@ public:
 public:
 
   void set_value(uint8_t ip, uint8_t hl, uint8_t ts, uint16_t tl, uint16_t id, uint16_t fm, uint8_t tol, uint8_t pt, uint16_t cs, uint8_t sa[4], uint8_t da[4]){
-
     ip_version = ip;
     header_length = hl;
     type_of_service = ts;
@@ -387,18 +367,14 @@ public:
     print_protocol_address(destination_address);
   }
   void print_ip(){
-
     std::cout << "IP:  " << "----- IP Header -----" << std::endl;
     std::cout << "IP:" << std::endl;
     std::cout << "IP:  " << "Version = ";
     print_ip_version();
     std::cout << "IP:  " << "Header length = " << int(header_length) * 4 << " bytes" << std::endl;;
-
     std::cout << "IP:  " << "Type of service = " << int_to_string(type_of_service) << std::endl;;
     std::cout << "IP:  " << "Total length = " << int(total_length) << " bytes"  << std::endl;
     std::cout << "IP:  " << "Identification = " << int(identification) << std::endl;;
-
-
     std::cout<< "IP:  " <<"Flags" << std::endl;;
     print_flags();
     std::cout << "IP:  " << "Fragment offset = ";
@@ -412,41 +388,30 @@ public:
     }else if(int(protocol) == 6){
       std::cout << " (TCP)" << std::endl;
     }
-
     std::cout << "IP:  " << "Header checksum = " << int_to_string(check_sum) << std::endl;
-
     std::cout << "IP:  " << "Source address = ";
     print_source_address();
     std::cout <<std::endl;
     std::cout << "IP:  " << "Destination address = ";
     print_destination_address();
     std::cout << std::endl;
-
     if(int(header_length) > 20){
       std::cout << "IP:  " << "Options ignored" << std::endl;
     }else{
       std::cout << "IP:  " << "No options" << std::endl;
     }
     std::cout << "IP:" << std::endl;
-
   }
-
-
 };
 
-
-
 class ICMP{
-
 private:
   uint8_t icmp_type;
   uint8_t icmp_code;
   uint16_t check_sum;
   uint16_t identifier;
   uint16_t squence_number;
-
 public:
-
   void set_value(uint8_t it, uint8_t ic, uint16_t cs, uint16_t ii, uint16_t sn){
     icmp_type = it;
     icmp_code = ic;
@@ -501,7 +466,6 @@ public:
 };
 
 class UDP{
-  // UPD class provides some operations for UPD header
 private:
   uint16_t source_port;
   uint16_t destination_port;
@@ -516,9 +480,7 @@ public:
     udp_checksum = ntohs(uc);
 
   }
-
   void print_udp(){
-
     std::cout << "UDP:  " << "----- UDP Header -----" << std::endl;
     std::cout << "UDP: " << std::endl;
     std::cout << "UDP:  " << "Source port = " << int(source_port) << std::endl;
@@ -540,9 +502,7 @@ public:
 };
 
 class TCP{
-
 private:
-
   uint16_t source_port;
   uint16_t destination_port;
   uint32_t sequence_number;
@@ -580,7 +540,6 @@ public:
     std::cout << size_t(ack_number) << std::endl;
   }
   void print_flags(){
-
     for(size_t i = 0; i < 6; i++){
       size_t c = 0;
       std::cout << "TCP:      " ;
@@ -608,7 +567,6 @@ public:
           std::cout <<".";
         }
         c++;
-
       }
       if(sign){
         if(i ==  0){
@@ -652,7 +610,6 @@ public:
     std::cout << int(urgent_pointer) << std::endl;
   }
   void print_tcp(){
-
     std::cout << "TCP:  " << "----- TCP Header -----" << std::endl;
     std::cout << "TCP: " << std::endl;
     std::cout << "TCP:  " << "Source port = ";
@@ -668,7 +625,6 @@ public:
     print_flags();
     std::cout << "TCP:  " << "Window = " << int(window_size) << std::endl;
     std::cout << "TCP:  " << "Checksum = " << int_to_string(check_sum);
-    //print_check_sum();
     std::cout << std::endl;
     std::cout << "TCP:  " << "Urgent pointer = ";
     print_urgent_pointer();
@@ -716,7 +672,6 @@ int main(int argc, char *argv[]){
   if( fileptr == NULL) std::cout <<"Open file failed!" << std::endl;
   fseek(fileptr, 0, SEEK_END); //calcutate the length of the file
   size_t filelen = ftell(fileptr);
-
   //  FILE *outptr =fopen("decoded_output2", "w+");
   rewind(fileptr);
   /* ---- counter init ------ */
@@ -743,11 +698,8 @@ int main(int argc, char *argv[]){
     packet_id++;
 
     frame_length = ntohl(frame_length); //convert the order to local host order
-
-    //    std::cout << "id " << packet_id << "  ethernet_frame_count " << ethernet_frame_count << " frame length:  " << frame_length  << "  " << process_length << " " << filelen <<   std::endl;
     /* ---------- Reading Ethernet Frame ------------ */
     Ethernet_frame ethernet_frame;
-      //first 6 bytes: destination address
     uint8_t dest[6];
     fread(dest, 1, 6, fileptr); // read the destination address
     uint8_t src[6];
@@ -920,18 +872,11 @@ int main(int argc, char *argv[]){
       }
       other_packets++;
     }
-    // if(ethernet_frame.get_packet_size() - read_length > 0){
-    //   fseek(fileptr, ethernet_frame.get_packet_size() - read_length, SEEK_CUR);
-    // }
     rewind(fileptr);
-
     process_length += ethernet_frame.get_packet_size();
     fseek(fileptr, process_length, SEEK_SET);
-    //  std::cout << "AFTER loop " << process_length  << " " << ethernet_frame.get_packet_size() << std::endl;
-
   }
   if(print_command == "s"){
-
     std::cout << "Ethernet frames:        " << ethernet_frame_count << std::endl;
     std::cout << "Ethernet broadcast:     " <<ethernet_boardcast << std::endl;
     std::cout << "  ARP packets:          " << apr_packets << std::endl;
