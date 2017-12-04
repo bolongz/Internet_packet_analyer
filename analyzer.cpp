@@ -885,7 +885,7 @@ int main(int argc, char *argv[]){
     std::cout << "    TCP packets:        " << tcp_packets << std::endl;
     std::cout << "    ICMP packets:       " << icmp_packets << std::endl;
     std::cout << "    other IP packets:   " << other_ip_packets << std::endl;
-    std::cout << "  other packets:        " << other_packets++ << std::endl;
+    std::cout << "  other packets:        " << other_packets << std::endl;
   }
   return 0;
 }
