@@ -131,7 +131,7 @@ public:
     if(hex_type == "0800"){
       std::cout << " (IP)" << std::endl;
     }else if(hex_type == "0806"){
-      std::cout << " (APR)" << std::endl;
+      std::cout << " (ARP)" << std::endl;
     }else{
       std::cout << " (unknown)" << std::endl;
     }
@@ -216,26 +216,26 @@ public:
   }
 
   void print_apr_message(){
-    std::cout << "APR:  ----- APR Frame -----" << std::endl;
-    std::cout << "APR:" << std::endl;
-    std::cout << "APR:  " << "Hardware type = " << int(hardtype);
+    std::cout << "ARP:  ----- ARP Frame -----" << std::endl;
+    std::cout << "ARP:  " << std::endl;
+    std::cout << "ARP:  " << "Hardware type = " << int(hardtype);
     if(int(hardtype) == 1) std::cout << " (Ethernet)" << std::endl;
-    std::cout << "APR:  " << "Protocol type = " << hex_type ;
+    std::cout << "ARP:  " << "Protocol type = " << hex_type ;
     if(hex_type == "0800"){
         std::cout << " (IP)" << std::endl;
     }else if(hex_type == "0806"){
-      std::cout << " (APR) " << std::endl;
+      std::cout << " (ARP)" << std::endl;
     }else{
       std::cout << " (unknown)" << std::endl;
     }
 
-    std::cout << "APR:  " << "Length of hardware address = " <<int(haddr_len) <<" bytes"  << std::endl;
-    std::cout << "APR:  " << "Length of protocol address = " <<int(paddr_len) << " bytes" <<  std::endl;
-    std::cout << "APR:  " << "Opcode " << int(operation); // << std::endl;
+    std::cout << "ARP:  " << "Length of hardware address = " <<int(haddr_len) <<" bytes"  << std::endl;
+    std::cout << "ARP:  " << "Length of protocol address = " <<int(paddr_len) << " bytes" <<  std::endl;
+    std::cout << "ARP:  " << "Opcode " << int(operation); // << std::endl;
     if(int(operation) == 1){
-    std::cout << " (APR Request)";
+    std::cout << " (ARP Request)";
     }else if (int(operation) == 2){
-      std::cout << " (APR Reply)";
+      std::cout << " (ARP Reply)";
     }
     std::cout << std::endl;
     std::cout << "ARP:  Sender's hardware address = ";
@@ -254,14 +254,14 @@ public:
     std::cout << "ARP:  Target protocol address = ";
     print_target_paddr();
     std::cout << std::endl;
-    std::cout << "APR:" << std::endl;
+    std::cout << "ARP:" << std::endl;
   }
   void print_apr_message_short(){
 
     print_protocol_address(sender_paddr);
     std::cout << " -> ";
     print_protocol_address(target_paddr);
-    std::cout << " APR who is ";
+    std::cout << " ARP who is ";
     print_protocol_address(target_paddr);
     std::cout << std::endl;
   }
@@ -303,20 +303,20 @@ public:
   }
 
   void print_icmp(){
-    std::cout << "ICMP: " << "----- ICMP -----" << std::endl;
+    std::cout << "ICMP:  " << "----- ICMP Header -----" << std::endl;
     std::cout << "ICMP: " << std::endl;
     std::cout << "ICMP: " << "Type = " << int(icmp_type);
     if(int(icmp_type) == 0){
-      std::cout<< " (Echo reply)";
+      std::cout<< " (Echo Reply)";
     }else if(int(icmp_type) == 8){
-      std::cout<< " (Echo request)";
+      std::cout<< " (Echo Request)";
     }std::cout<< std::endl;
     std::cout << "ICMP: " << "Code = " << int(icmp_code) << std::endl;
     std::string checksum = int_to_string(int(check_sum));
     std::cout << "ICMP: " << "Checksum = " << checksum << std::endl;
     std::cout << "ICMP: " << "Identifier = " << int(identifier) << std::endl;
     std::cout << "ICMP: " << "Sequence number = " << int(squence_number) << std::endl;
-    std::cout << "ICMP: " << std::endl;
+    std::cout << "ICMP:" << std::endl;
   }
 };
 
@@ -478,8 +478,8 @@ public:
     std::cout << "TCP:  Flags" << std::endl;
     print_flags();
     std::cout << "TCP:  " << "Window = " << int(window_size) << std::endl;
-    std::cout << "TCP:  " << "Checksum = ";
-    print_check_sum();
+    std::cout << "TCP:  " << "Checksum = " << int_to_string(check_sum);
+    //print_check_sum();
     std::cout << std::endl;
     std::cout << "TCP:  " << "Urgent pointer = ";
     print_urgent_pointer();
@@ -587,7 +587,7 @@ public:
     print_ip_version();
     std::cout << "IP:  " << "Header length = " << int(header_length) * 4 << " bytes" << std::endl;;
 
-    std::cout << "IP:  " << "Type of service = " << int(type_of_service) << std::endl;;
+    std::cout << "IP:  " << "Type of service = " << int_to_string(type_of_service) << std::endl;;
     std::cout << "IP:  " << "Total length = " << int(total_length) << " bytes"  << std::endl;
     std::cout << "IP:  " << "Identification = " << int(identification) << std::endl;;
 
