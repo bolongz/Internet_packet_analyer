@@ -1,0 +1,39 @@
+./analyzer dumpfile.3  > a.txt
+./panalyzer.linprog dumpfile.3 > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.200  > a.txt
+./panalyzer.linprog dumpfile.200 > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.500  > a.txt
+./panalyzer.linprog dumpfile.500 > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.5000  > a.txt
+./panalyzer.linprog dumpfile.5000 > b.txt
+diff a.txt b.txt
+
+./analyzer dumpfile.3 -v > a.txt
+./panalyzer.linprog dumpfile.3 -v > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.200  -v > a.txt
+./panalyzer.linprog dumpfile.200 -v > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.500  -v > a.txt
+./panalyzer.linprog dumpfile.500 -v > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.5000  -v > a.txt
+./panalyzer.linprog dumpfile.5000 -v > b.txt
+diff a.txt b.txt
+
+
+./analyzer dumpfile.3 -V > a.txt
+./panalyzer.linprog dumpfile.3 -V > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.200  -V > a.txt
+./panalyzer.linprog dumpfile.200 -V > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.500  -V > a.txt
+./panalyzer.linprog dumpfile.500 -V > b.txt
+diff a.txt b.txt
+./analyzer dumpfile.5000  -V > a.txt
+./panalyzer.linprog dumpfile.5000 -V > b.txt
+diff a.txt b.txt
