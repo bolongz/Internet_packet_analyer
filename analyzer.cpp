@@ -141,11 +141,18 @@ public:
   void print_header_short(){
 
     if(hex_type != "0800" || hex_type != "0806"){
-      std::cout << "unknow packet " <<"(";
+      std::cout << "(unknown packet) " <<"(";
       print_dest_mac();
       std::cout << ", " ;
       print_src_mac();
-      std::cout <<", " <<hex_type << std::endl;
+      std::string _hex = int_to_string(type);
+      if(_hex.size() == 2){
+
+        std::cout <<", 0:" <<_hex;
+      }else if(_hex.size() == 3){
+        std::cout << ", "<<_hex[0] <<":" <<_hex[1] <<_hex[2];
+      }
+
       std::cout << ")" <<std::endl;
     }
   }
@@ -256,16 +263,178 @@ public:
     std::cout << std::endl;
     std::cout << "ARP:" << std::endl;
   }
-  void print_apr_message_short(){
+  void print_apr_message_short(Ethernet_frame &ethernet_frame){
 
-    print_protocol_address(sender_paddr);
-    std::cout << " -> ";
-    print_protocol_address(target_paddr);
-    std::cout << " ARP who is ";
-    print_protocol_address(target_paddr);
-    std::cout << std::endl;
+    if(ethernet_frame.is_boardcast()){
+      print_protocol_address(sender_paddr);
+      std::cout << " -> ";
+      std::cout << "(broadcast) (ARP) ";
+        //print_protocol_address(target_paddr);
+      std::cout << "who is ";
+      print_protocol_address(target_paddr);
+      std::cout << std::endl;
+    }else{
+
+      if(int(operation) == 1){
+
+        print_protocol_address(sender_paddr);
+        std::cout << " -> ";
+        print_protocol_address(target_paddr);
+        std::cout << " (ARP) who is ";
+        print_protocol_address(target_paddr);
+        std::cout << std::endl;
+      }else if(int(operation) == 2){
+        print_protocol_address(sender_paddr);
+        std::cout << " -> ";
+        print_protocol_address(target_paddr);
+        std::cout << " (ARP) ";
+        print_protocol_address(sender_paddr);
+        std::cout <<"'s hardware address is ";
+        print_mac_address(sender_haddr);
+        std::cout << std::endl;
+      }
+    }
   }
+
+
 };
+
+
+class IP{
+
+private:
+  uint8_t ip_version;
+  uint8_t header_length;
+  uint8_t type_of_service;
+  uint16_t total_length;
+  uint16_t identification;
+  uint16_t fragment_model; //one bit empty
+  uint8_t time_to_live;
+  uint8_t protocol;
+  uint16_t check_sum;
+public:
+  uint8_t source_address[4];
+  uint8_t destination_address[4];
+
+public:
+
+  void set_value(uint8_t ip, uint8_t hl, uint8_t ts, uint16_t tl, uint16_t id, uint16_t fm, uint8_t tol, uint8_t pt, uint16_t cs, uint8_t sa[4], uint8_t da[4]){
+
+    ip_version = ip;
+    header_length = hl;
+    type_of_service = ts;
+    total_length = ntohs(tl);
+    identification = ntohs(id);
+    fragment_model = ntohs(fm);
+    time_to_live = tol;
+    protocol = pt;
+    check_sum = ntohs(cs);
+    for(size_t i = 0; i < 4; i++){
+      source_address[i] = sa[i];
+      destination_address[i] = da[i];
+    }
+  }
+  int get_protocol(){
+    return int(protocol);
+  }
+  void print_ip_version(){
+    std::cout << int(ip_version) << std::endl;
+  }
+
+  void print_header_length(){
+    std::cout << int(header_length) << std::endl;
+  }
+  void print_type_of_service(){
+    std::cout << int(type_of_service) << std::endl;
+  }
+  void print_total_length(){
+    std::cout << int(total_length) << std::endl;
+  }
+  void print_identification(){
+    print_hex(identification);
+    std::cout  << std::endl;
+  }
+  void print_flags(){
+    uint32_t df  = nth_bit(fragment_model, 14);
+    uint32_t mf  = nth_bit(fragment_model, 13);
+    if(df == 0){
+      std::cout << "IP:    ";
+      std::cout << "." << "0.. .... = allow fragment" << std::endl;
+    }else{
+      std::cout << "IP:    ";
+      std::cout << "." << "1.. .... = do not fragment" << std::endl;
+    }
+    if(mf == 0){
+      std::cout << "IP:    ";
+      std::cout << "." << ".0. .... = last fragment" << std::endl;
+    }
+
+  }
+  void print_fragment_offset(){
+    uint16_t fm = fragment_model & 0x1FFF;
+    std::cout << int(fm) << " bytes" << std::endl;
+  }
+  void print_protocol(){
+    std::cout << int(protocol); // << std::endl;
+  }
+  void print_check_sum(){
+    print_hex(check_sum);
+  }
+  void print_source_address(){
+    print_protocol_address(source_address);
+  }
+  void print_destination_address(){
+    print_protocol_address(destination_address);
+  }
+  void print_ip(){
+
+    std::cout << "IP:  " << "----- IP Header -----" << std::endl;
+    std::cout << "IP:" << std::endl;
+    std::cout << "IP:  " << "Version = ";
+    print_ip_version();
+    std::cout << "IP:  " << "Header length = " << int(header_length) * 4 << " bytes" << std::endl;;
+
+    std::cout << "IP:  " << "Type of service = " << int_to_string(type_of_service) << std::endl;;
+    std::cout << "IP:  " << "Total length = " << int(total_length) << " bytes"  << std::endl;
+    std::cout << "IP:  " << "Identification = " << int(identification) << std::endl;;
+
+
+    std::cout<< "IP:  " <<"Flags" << std::endl;;
+    print_flags();
+    std::cout << "IP:  " << "Fragment offset = ";
+    print_fragment_offset();
+    std::cout << "IP:  " << "Protocol = ";
+    print_protocol();
+    if(int(protocol) == 1){
+      std::cout << " (ICMP)" << std::endl;
+    }else if(int(protocol) == 17){
+      std::cout << " (UDP)" << std::endl;
+    }else if(int(protocol) == 6){
+      std::cout << " (TCP)" << std::endl;
+    }
+
+    std::cout << "IP:  " << "Header checksum = " << int_to_string(check_sum) << std::endl;
+
+    std::cout << "IP:  " << "Source address = ";
+    print_source_address();
+    std::cout <<std::endl;
+    std::cout << "IP:  " << "Destination address = ";
+    print_destination_address();
+    std::cout << std::endl;
+
+    if(int(header_length) > 20){
+      std::cout << "IP:  " << "Options ignored" << std::endl;
+    }else{
+      std::cout << "IP:  " << "No options" << std::endl;
+    }
+    std::cout << "IP:" << std::endl;
+
+  }
+
+
+};
+
+
 
 class ICMP{
 
@@ -318,6 +487,17 @@ public:
     std::cout << "ICMP: " << "Sequence number = " << int(squence_number) << std::endl;
     std::cout << "ICMP:" << std::endl;
   }
+  void print_icmp_short(IP &ip_frame){
+    print_protocol_address(ip_frame.source_address);
+    std::cout << " -> ";
+    print_protocol_address(ip_frame.destination_address);
+    if(int(icmp_type) == 8){
+      std::cout << " (ICMP), Echo Request (type=";
+    }else if(int(icmp_type) == 0){
+      std::cout << " (ICMP), Echo Reply (type=";
+    }
+    std::cout << int(icmp_type) <<")" << std::endl;
+  }
 };
 
 class UDP{
@@ -347,6 +527,15 @@ public:
     std::string checksum = int_to_string(int(udp_checksum));
     std::cout << "UDP:  " << "Checksum = " << checksum << std::endl;
     std::cout << "UDP:" << std::endl;
+  }
+   void print_udp_short(IP &ip_frame){
+     print_protocol_address(ip_frame.source_address);
+     std::cout << " -> ";
+     print_protocol_address(ip_frame.destination_address);
+     std::cout << " (UDP) sourceport = ";
+     std::cout << int(source_port) <<" ";
+     std::cout << "destport = ";
+     std::cout << int(destination_port) <<  std::endl;
   }
 };
 
@@ -492,140 +681,150 @@ public:
 
   }
 
+  void print_udp_short(IP &ip_frame){
+    print_protocol_address(ip_frame.source_address);
+    std::cout << " -> ";
+    print_protocol_address(ip_frame.destination_address);
+    std::cout << " (TCP) sourceport = ";
+    std::cout << int(source_port) <<" ";
+    std::cout << "destport = ";
+    std::cout << int(destination_port) <<  std::endl;
+  }
+
 };
 
-class IP{
+// class IP{
 
-private:
-  uint8_t ip_version;
-  uint8_t header_length;
-  uint8_t type_of_service;
-  uint16_t total_length;
-  uint16_t identification;
-  uint16_t fragment_model; //one bit empty
-  uint8_t time_to_live;
-  uint8_t protocol;
-  uint16_t check_sum;
-  uint8_t source_address[4];
-  uint8_t destination_address[4];
+// private:
+//   uint8_t ip_version;
+//   uint8_t header_length;
+//   uint8_t type_of_service;
+//   uint16_t total_length;
+//   uint16_t identification;
+//   uint16_t fragment_model; //one bit empty
+//   uint8_t time_to_live;
+//   uint8_t protocol;
+//   uint16_t check_sum;
+//   uint8_t source_address[4];
+//   uint8_t destination_address[4];
 
-public:
+// public:
 
-  void set_value(uint8_t ip, uint8_t hl, uint8_t ts, uint16_t tl, uint16_t id, uint16_t fm, uint8_t tol, uint8_t pt, uint16_t cs, uint8_t sa[4], uint8_t da[4]){
+//   void set_value(uint8_t ip, uint8_t hl, uint8_t ts, uint16_t tl, uint16_t id, uint16_t fm, uint8_t tol, uint8_t pt, uint16_t cs, uint8_t sa[4], uint8_t da[4]){
 
-    ip_version = ip;
-    header_length = hl;
-    type_of_service = ts;
-    total_length = ntohs(tl);
-    identification = ntohs(id);
-    fragment_model = ntohs(fm);
-    time_to_live = tol;
-    protocol = pt;
-    check_sum = ntohs(cs);
-    for(size_t i = 0; i < 4; i++){
-      source_address[i] = sa[i];
-      destination_address[i] = da[i];
-    }
-  }
-  int get_protocol(){
-    return int(protocol);
-  }
-  void print_ip_version(){
-    std::cout << int(ip_version) << std::endl;
-  }
+//     ip_version = ip;
+//     header_length = hl;
+//     type_of_service = ts;
+//     total_length = ntohs(tl);
+//     identification = ntohs(id);
+//     fragment_model = ntohs(fm);
+//     time_to_live = tol;
+//     protocol = pt;
+//     check_sum = ntohs(cs);
+//     for(size_t i = 0; i < 4; i++){
+//       source_address[i] = sa[i];
+//       destination_address[i] = da[i];
+//     }
+//   }
+//   int get_protocol(){
+//     return int(protocol);
+//   }
+//   void print_ip_version(){
+//     std::cout << int(ip_version) << std::endl;
+//   }
 
-  void print_header_length(){
-    std::cout << int(header_length) << std::endl;
-  }
-  void print_type_of_service(){
-    std::cout << int(type_of_service) << std::endl;
-  }
-  void print_total_length(){
-    std::cout << int(total_length) << std::endl;
-  }
-  void print_identification(){
-    print_hex(identification);
-    std::cout  << std::endl;
-  }
-  void print_flags(){
-    uint32_t df  = nth_bit(fragment_model, 14);
-    uint32_t mf  = nth_bit(fragment_model, 13);
-    if(df == 0){
-      std::cout << "IP:    ";
-      std::cout << "." << "0.. .... = allow fragment" << std::endl;
-    }else{
-      std::cout << "IP:    ";
-      std::cout << "." << "1.. .... = do not fragment" << std::endl;
-    }
-    if(mf == 0){
-      std::cout << "IP:    ";
-      std::cout << "." << ".0. .... = last fragment" << std::endl;
-    }
+//   void print_header_length(){
+//     std::cout << int(header_length) << std::endl;
+//   }
+//   void print_type_of_service(){
+//     std::cout << int(type_of_service) << std::endl;
+//   }
+//   void print_total_length(){
+//     std::cout << int(total_length) << std::endl;
+//   }
+//   void print_identification(){
+//     print_hex(identification);
+//     std::cout  << std::endl;
+//   }
+//   void print_flags(){
+//     uint32_t df  = nth_bit(fragment_model, 14);
+//     uint32_t mf  = nth_bit(fragment_model, 13);
+//     if(df == 0){
+//       std::cout << "IP:    ";
+//       std::cout << "." << "0.. .... = allow fragment" << std::endl;
+//     }else{
+//       std::cout << "IP:    ";
+//       std::cout << "." << "1.. .... = do not fragment" << std::endl;
+//     }
+//     if(mf == 0){
+//       std::cout << "IP:    ";
+//       std::cout << "." << ".0. .... = last fragment" << std::endl;
+//     }
 
-  }
-  void print_fragment_offset(){
-    uint16_t fm = fragment_model & 0x1FFF;
-    std::cout << int(fm) << " bytes" << std::endl;
-  }
-  void print_protocol(){
-    std::cout << int(protocol); // << std::endl;
-  }
-  void print_check_sum(){
-    print_hex(check_sum);
-  }
-  void print_source_address(){
-    print_protocol_address(source_address);
-  }
-  void print_destination_address(){
-    print_protocol_address(destination_address);
-  }
-  void print_ip(){
+//   }
+//   void print_fragment_offset(){
+//     uint16_t fm = fragment_model & 0x1FFF;
+//     std::cout << int(fm) << " bytes" << std::endl;
+//   }
+//   void print_protocol(){
+//     std::cout << int(protocol); // << std::endl;
+//   }
+//   void print_check_sum(){
+//     print_hex(check_sum);
+//   }
+//   void print_source_address(){
+//     print_protocol_address(source_address);
+//   }
+//   void print_destination_address(){
+//     print_protocol_address(destination_address);
+//   }
+//   void print_ip(){
 
-    std::cout << "IP:  " << "----- IP Header -----" << std::endl;
-    std::cout << "IP:" << std::endl;
-    std::cout << "IP:  " << "Version = ";
-    print_ip_version();
-    std::cout << "IP:  " << "Header length = " << int(header_length) * 4 << " bytes" << std::endl;;
+//     std::cout << "IP:  " << "----- IP Header -----" << std::endl;
+//     std::cout << "IP:" << std::endl;
+//     std::cout << "IP:  " << "Version = ";
+//     print_ip_version();
+//     std::cout << "IP:  " << "Header length = " << int(header_length) * 4 << " bytes" << std::endl;;
 
-    std::cout << "IP:  " << "Type of service = " << int_to_string(type_of_service) << std::endl;;
-    std::cout << "IP:  " << "Total length = " << int(total_length) << " bytes"  << std::endl;
-    std::cout << "IP:  " << "Identification = " << int(identification) << std::endl;;
-
-
-    std::cout<< "IP:  " <<"Flags" << std::endl;;
-    print_flags();
-    std::cout << "IP:  " << "Fragment offset = ";
-    print_fragment_offset();
-    std::cout << "IP:  " << "Protocol = ";
-    print_protocol();
-    if(int(protocol) == 1){
-      std::cout << " (ICMP)" << std::endl;
-    }else if(int(protocol) == 17){
-      std::cout << " (UDP)" << std::endl;
-    }else if(int(protocol) == 6){
-      std::cout << " (TCP)" << std::endl;
-    }
-
-    std::cout << "IP:  " << "Header checksum = " << int_to_string(check_sum) << std::endl;
-
-    std::cout << "IP:  " << "Source address = ";
-    print_source_address();
-    std::cout <<std::endl;
-    std::cout << "IP:  " << "Destination address = ";
-    print_destination_address();
-    std::cout << std::endl;
-
-    if(int(header_length) > 20){
-      std::cout << "IP:  " << "Options ignored" << std::endl;
-    }else{
-      std::cout << "IP:  " << "No options" << std::endl;
-    }
-    std::cout << "IP:" << std::endl;
-
-  }
+//     std::cout << "IP:  " << "Type of service = " << int_to_string(type_of_service) << std::endl;;
+//     std::cout << "IP:  " << "Total length = " << int(total_length) << " bytes"  << std::endl;
+//     std::cout << "IP:  " << "Identification = " << int(identification) << std::endl;;
 
 
-};
+//     std::cout<< "IP:  " <<"Flags" << std::endl;;
+//     print_flags();
+//     std::cout << "IP:  " << "Fragment offset = ";
+//     print_fragment_offset();
+//     std::cout << "IP:  " << "Protocol = ";
+//     print_protocol();
+//     if(int(protocol) == 1){
+//       std::cout << " (ICMP)" << std::endl;
+//     }else if(int(protocol) == 17){
+//       std::cout << " (UDP)" << std::endl;
+//     }else if(int(protocol) == 6){
+//       std::cout << " (TCP)" << std::endl;
+//     }
+
+//     std::cout << "IP:  " << "Header checksum = " << int_to_string(check_sum) << std::endl;
+
+//     std::cout << "IP:  " << "Source address = ";
+//     print_source_address();
+//     std::cout <<std::endl;
+//     std::cout << "IP:  " << "Destination address = ";
+//     print_destination_address();
+//     std::cout << std::endl;
+
+//     if(int(header_length) > 20){
+//       std::cout << "IP:  " << "Options ignored" << std::endl;
+//     }else{
+//       std::cout << "IP:  " << "No options" << std::endl;
+//     }
+//     std::cout << "IP:" << std::endl;
+
+//   }
+
+
+// };
 
 
 int main(int argc, char *argv[]){
@@ -696,8 +895,6 @@ int main(int argc, char *argv[]){
     if(ethernet_frame.is_boardcast()) ethernet_boardcast++; // count the boardcasting
     if(print_command == "d"){
       ethernet_frame.print_header(); // print the header for the ethernet frame
-    }else if(print_command == "a"){
-      ethernet_frame.print_header_short();
     }
     /* ---------- END Reading Ethernet Frame ------------ */
     /* ---------- Reading APR Frame ------------ */
@@ -728,7 +925,7 @@ int main(int argc, char *argv[]){
       if(print_command == "d"){
         apr_message.print_apr_message();
       }else if(print_command == "a"){
-        apr_message.print_apr_message_short();
+        apr_message.print_apr_message_short(ethernet_frame);
       }
       /* ---------- END APR Frame ------------ */
       /* ----------  Reading IP  Frame ------------ */
@@ -785,6 +982,8 @@ int main(int argc, char *argv[]){
         icmp_packets++;
         if(print_command == "d"){
           icmp_frame.print_icmp();
+        }else if(print_command == "a"){
+          icmp_frame.print_icmp_short(ip_frame);
         }
       /* ------- END ICMP reading ------- */
         /* ------- UDP starting reading ------- */
@@ -802,6 +1001,8 @@ int main(int argc, char *argv[]){
         udp_frame.set_value(source_port, destination_port, udp_length, udp_checksum);
         if(print_command == "d"){
           udp_frame.print_udp();
+        }else if(print_command == "a"){
+          udp_frame.print_udp_short(ip_frame);
         }
         udp_packets++;
         /* ------- END UDP reading ------- */
@@ -833,6 +1034,8 @@ int main(int argc, char *argv[]){
         read_length += int(tcp_header_length);
         if(print_command == "d"){
           tcp_frame.print_tcp();
+        }else if(print_command == "a"){
+          tcp_frame.print_udp_short(ip_frame);
         }
 
         // if(int(tcp_header_length) > 20){
@@ -847,7 +1050,9 @@ int main(int argc, char *argv[]){
 
       /* ----------  END Reading IP  Frame ------------ */
     }else{
-
+      if(print_command == "a"){
+        ethernet_frame.print_header_short();
+      }
       other_packets++;
     }
     // if(ethernet_frame.get_packet_size() - read_length > 0){
@@ -872,7 +1077,5 @@ int main(int argc, char *argv[]){
     std::cout << "    other IP packets:   " << other_ip_packets << std::endl;
     std::cout << "  other packets:        " << other_packets++ << std::endl;
   }
-
-  //}
   return 0;
 }
