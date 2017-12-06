@@ -657,7 +657,7 @@ int main(int argc, char *argv[]){
   if(argc > 2){
     std::string lines(argv[2]);
     if(lines == "-c"){
-      lines_number = atoi(argv[2]);
+      lines_number = atoi(argv[3]);
     }else{
 
       if(lines == "-v"){
@@ -693,7 +693,10 @@ int main(int argc, char *argv[]){
     size_t read_length = 0;
     fread(&frame_length, 4, 1, fileptr); process_length += 4; // read the length of the frame with the first 4 bytes
     ethernet_frame_count++;
-    if(lines_number != -1 && ethernet_frame_count > size_t(lines_number)) break;
+    if(lines_number != -1 && ethernet_frame_count > size_t(lines_number)) {
+      ethernet_frame_count--;
+      break;
+    }
     read_length = 4;
     packet_id++;
 

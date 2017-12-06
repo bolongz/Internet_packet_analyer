@@ -37,3 +37,28 @@ diff a222.txt b222.txt
 ./analyzer dumpfile.5000  -V > a333.txt
 ./panalyzer.linprog dumpfile.5000 -V > b333.txt
 diff a333.txt b333.txt
+
+
+./analyzer dumpfile.5000  -c 100 > a0000.txt
+./panalyzer.linprog dumpfile.5000 -c 100 > b0000.txt
+diff a0000.txt b0000.txt
+
+./analyzer dumpfile.5000  -c 1000 > a0001.txt
+./panalyzer.linprog dumpfile.5000 -c 1000 > b0001.txt
+diff a0001.txt b0001.txt
+
+./analyzer dumpfile.5000  -c 2000 > a0002.txt
+./panalyzer.linprog dumpfile.5000 -c 2000 > b0002.txt
+diff a0002.txt b0002.txt
+
+./analyzer dumpfile.5000  -c 3000 > a0003.txt
+./panalyzer.linprog dumpfile.5000 -c 3000 > b0003.txt
+diff a0003.txt b0003.txt
+
+./analyzer dumpfile.5000  -c 4000 > a0004.txt
+./panalyzer.linprog dumpfile.5000 -c 4000 > b0004.txt
+diff a0004.txt b0004.txt
+
+./analyzer dumpfile.5000  -c 5000 > a0005.txt
+./panalyzer.linprog dumpfile.5000 -c 5000 > b0005.txt
+diff a0005.txt b0005.txt
